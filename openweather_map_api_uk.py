@@ -54,10 +54,10 @@ d2 = d2[~pd.isnull(d2['lat'])]
 d2 = d2.drop(columns=['data'])
 d2 = d2.reset_index()
 
+################################################################################
 
 # configuring df
 dff = pd.DataFrame(data={'name':['xyz']})
-################################################################################
 
 # make an api call for each lat/long combination as created earlier and store results in a dataframe
 for ii in range(0,len(d2),1):
@@ -102,8 +102,6 @@ def base_map_plot(sdata,bar,title):
         plt.colorbar(label="Wind speed/mph")
     plt.title(title)
 ################################################################################
-
-# apply lat/lon checkers
 
 # graph the data
 lon = dff['lon'].values
