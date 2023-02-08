@@ -61,7 +61,7 @@ dff = pd.DataFrame(data={'name':['xyz']})
 # make an api call for each lat/long combination as created earlier and store results in a dataframe
 for ii in range(0,len(d2),1):
         
-        city = "https://api.openweathermap.org/data/2.5/weather?lat="+str(d2['lat'][ii])+"&lon="+str(d2['lon'][ii])+"&"+api_key+"&units=imperial"
+        city = "https://api.openweathermap.org/data/2.5/weather?lat="+str(d2['lat'][ii])+"&lon="+str(d2['lon'][ii])+"&apikey="+api_key+"&units=imperial"
         city = pd.read_json(city, lines=True)
         co_ords = pd.DataFrame([city.coord[0]])
         name = city.name
