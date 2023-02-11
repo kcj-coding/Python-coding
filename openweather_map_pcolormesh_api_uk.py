@@ -50,6 +50,10 @@ for each in lon_range:
 
 # remove things we do not need
 d2 = d2[~pd.isnull(d2['lat'])]
+d2 = d2[d2['lat']<=90] # filter to maximum latitude
+d2 = d2[d2['lat']>=-90] # filter for minimum latitude
+d2 = d2[d2['lon']<=180] # filter for maximum longitude
+d2 = d2[d2['lon']>=-180] # filter for minimum longitude
 d2 = d2.drop(columns=['data'])
 d2 = d2.reset_index()
 
