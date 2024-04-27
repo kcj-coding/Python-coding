@@ -104,4 +104,11 @@ non_dupe_ltr = re.findall(r"\b(?!\w*?(\w)\1)(\w+)", string3)
 # find instances of repeated letters in the string
 rptd_ltrs = re.findall(r"(\w+)\1", string3)
 
+################################################################################
 
+string4 = "The summary report was useful. The report had samples of data."
+
+# find the first occurrence of report or sample, case insensitive
+# which is separated by a word boundary, or begins with a number and then a word boundary
+
+sngl_match = re.findall(r"\b([Rr]eport|[Ss]ample).*\b.*|.*\d+.*\b([Rr]eport|[Ss]ample)\b.*", string4)
