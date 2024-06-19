@@ -112,3 +112,13 @@ string4 = "The summary report was useful. The report had samples of data."
 # which is separated by a word boundary, or begins with a number and then a word boundary
 
 sngl_match = re.findall(r"\b([Rr]eport|[Ss]ample).*\b.*|.*\d+.*\b([Rr]eport|[Ss]ample)\b.*", string4)
+
+################################################################################
+
+string5 = r"C:\Users\kelvi\Documents\file.csv"
+
+# find any match to a letter "k" and return the entire string between \
+k_match = re.findall(r"(?=k[\w+]).*?(?=\\|\/|(?=$))", string5)
+
+# extract the filename
+file_name = re.findall(r"[^\\]+(?=\.|$)", string5)
