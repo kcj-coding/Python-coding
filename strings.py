@@ -122,3 +122,10 @@ k_match = re.findall(r"(?=k[\w+]).*?(?=\\|\/|(?=$))", string5)
 
 # extract the filename
 file_name = re.findall(r"[^\\]+(?=\.|$)", string5)
+
+################################################################################
+
+string6 = "1. The day: The day was good. 2. The next day: The next day was 26.2C."
+
+# find the numbers (with the fullstop) before the :
+nbr_match = re.findall("(\d+)(?=\D+\:)", string6)
