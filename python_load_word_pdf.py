@@ -3,9 +3,14 @@ import pypdf as PyPDF2#PyPDF2
 import docx
 import glob
 import re
+import os
 
 # file folder location 
 folder = r"C:\\Folder"
+
+# check output folder exists and if not create it
+if not os.path.exists(folder):
+    os.makedirs(folder, exist_ok=True)
 
 # read in all word/docx and pdf files
 list_word_files = glob.glob(rf"{folder}/*.docx") + glob.glob(rf"{folder}/*.doc")
