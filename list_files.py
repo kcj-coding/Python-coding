@@ -2,7 +2,7 @@ import pandas as pd
 import os
 import datetime
 
-folder = r"C:\Users\janan\Desktop"
+folder = r"C:\Users\kelvi\Desktop"
 
 # get sub folder
 folders = [x[0] for x in os.walk(folder)]
