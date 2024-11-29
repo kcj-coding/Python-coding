@@ -129,3 +129,10 @@ string6 = "1. The day: The day was good. 2. The next day: The next day was 26.2C
 
 # find the numbers (with the fullstop) before the :
 nbr_match = re.findall("(\d+)(?=\D+\:)", string6)
+
+################################################################################
+
+string7 = r"[C:\\Folder\File.xyz]" # read folder location and file
+
+# get the file extension
+file_ext = re.findall("(\.[^.]+)$", string7)
