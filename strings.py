@@ -132,7 +132,13 @@ nbr_match = re.findall("(\d+)(?=\D+\:)", string6)
 
 ################################################################################
 
-string7 = r"[C:\\Folder\File.xyz]" # read folder location and file
+string7 = r"C:\\Folder\File.xyz" # read folder location and file
 
 # get the file extension
 file_ext = re.findall("(\.[^.]+)$", string7)
+
+# get the filename
+filename = re.findall("([\w]+(?!\\\)\.\w+)$", string7) # \\\ is \
+
+# get the folder
+folder = re.findall("(\w+.*)(?<=\\\)", string7)
