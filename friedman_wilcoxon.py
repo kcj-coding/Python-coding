@@ -13,6 +13,8 @@ xyz = [1,2,3]*90
 
 df = pd.DataFrame({'labels':labels, 'nums':nums, 'xyz':xyz})
 
+#%%
+
 # boxplot graph of data
 labels = df['labels'].unique()
 
@@ -54,20 +56,36 @@ def boxplot_graph(data, labels):
 
 bp = boxplot_graph(collection, labels=labels)
 
+#%%
+
 # convert labels to factor
 df['labels_fct'] = pd.factorize(df['labels'])[0]
 
 # drop categorical column
-df = df.drop('labels', axis="columns")
+df1 = df.drop('labels', axis="columns")
 
 # run the friedman test through the columns
-f_test = friedmanchisquare(df['labels_fct'],df['nums'],df['xyz'])
+f_test = friedmanchisquare(df1['labels_fct'],df1['nums'],df1['xyz'])
 f_res = pd.DataFrame({'test':'Friedman','statistic':f_test[0],'pvalue':f_test[0]},index=[0])
 
 # run pairwise wilcoxon
-wilc_test = [wilcoxon(df[i],df[j]) for i,j in itertools.combinations(df.columns,2)]    
+wilc_test = [wilcoxon(df1[i],df1[j]) for i,j in itertools.combinations(df1.columns,2)]    
 w_res = pd.DataFrame(wilc_test)
-w_res['test'] = ["wilcoxon " + i+" vs "+j for i,j in itertools.combinations(df.columns,2)]
+w_res['test'] = ["wilcoxon " + i+" vs "+j for i,j in itertools.combinations(df1.columns,2)]
 
 # concat the results
 res = pd.concat([f_res,w_res])
+
+#%%
+
+from scipy.stats import ks_2samp
+
+# perform Kolmogorov-Smirnov test
+ks_tst = ks_2samp(df['nums'][df['labels']=="a"], df['nums'][df['labels']=="b"])
+
+#%%
+
+from scipy import stats
+
+# perform Kruskal–Wallis anova test
+kw_tst = stats.kruskal(df['nums'][df['labels']=="a"], df['nums'][df['labels']=="b"])
