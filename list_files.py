@@ -45,7 +45,7 @@ for filer in files['file_link']:
     size = os.stat(filer).st_size#rf"{folder1}\{filer}").st_size
     sizes.append(size) # size in Bytes
     
-    ext = re.sub(".*(?<=\.)","",filer)
+    ext = re.sub("(.+?)(?=\.[^.]*$)","",filer)
     exts.append(ext)
 
         
