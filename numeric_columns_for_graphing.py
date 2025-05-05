@@ -10,7 +10,8 @@ import math
 import random
 import re
 import os
-#import time
+import glob
+import time
 
 ################# configure variables #########################################
 
@@ -94,6 +95,8 @@ def line_graph(x,y,xx,yy,title,file_loc):
 # check
 if (graph_by_column_name == True and graph_by_column_number==True):
     raise ValueError("Cannot both graph_by_ be true")
+    
+start_time = time.time()
 
 # df = pd.DataFrame({"val":[1,2,3], "val_str":["1","2","3"]})
 
@@ -499,3 +502,17 @@ if graph_by_column_number == True:
                     # k-means
             except:
                 pass
+            
+print("runtime of processing: " +str(round(time.time()-start_time,3))+" seconds")
+
+# remove locally saved plots
+# get sub folder
+files_list = []
+folders = [x[0] for x in os.walk(folder)]
+for folder_ext in folders:
+    files_list1 = [x for x in glob.glob(rf"{folder_ext}/*.png")]
+    files_list.append(files_list1)
+    
+for file in files_list:
+    for filer in file:
+        os.remove(filer)
