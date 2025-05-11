@@ -33,7 +33,9 @@ if not os.path.exists(folder):
 ################# define functions ###########################################
     
 def number_format(num):
-    if num > 0:
+    if math.isnan(num):
+        digits = 0
+    elif num > 0:
         digits = int(math.log10(num))+1
     elif num == 0:
         digits = 1
@@ -42,9 +44,11 @@ def number_format(num):
 
     if digits > 3 or digits < 0:
         return '{:.2e}'.format(num)
+    elif digits == 0:
+        return 0
     else:
         return round(num,2)
-
+    
 def line_graph(x,y,xx,yy,title,file_loc):
     fig, ax = plt.subplots()
     
@@ -55,8 +59,8 @@ def line_graph(x,y,xx,yy,title,file_loc):
     #ax.plot(np.arange(0,len(df.data[df.type=='b'])), df.c_number[df.type=='b'], label='Product b', color='#14022E')
     
     ax.scatter(x,y,alpha=0.5, c="black")
-    ax.plot(X, y_pred_lr)
-    ax.plot(X, y_pred_ply)
+    ax.plot(X, y_pred_lr, c="blue")
+    ax.plot(X, y_pred_ply, c="red")
     
     # Customise some display properties for line graph
     ax.set_ylabel(yy,size=8)
