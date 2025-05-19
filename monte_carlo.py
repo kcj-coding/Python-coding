@@ -31,6 +31,7 @@ def grapher(lister,prob,xxx,xxx1,word,n):
     plt.axhline(y=prob, color='r', linestyle='dashed')
     [plt.axvline(_x, color='#111212',linewidth=1,alpha=0.1) for _x in xxx]
     [plt.axvline(_x, color='#42f5f2',linewidth=1,alpha=0.1) for _x in xxx1]
+    plt.gca().spines[['right','top']].set_visible(False)
     plt.xlabel("Iterations")
     plt.ylabel("Probability")
     plt.title(f"Total Probability of {word} outcome from coin flip; n={n}\n{val1}={len(xxx1)}; {val2}={len(xxx)}")
@@ -78,13 +79,15 @@ def monte_carlo_coin_xtra(runs, n, dff):
                plt.figure(1)
                plt.plot(x_valer, y_valer1, c=np.random.rand(3,)) 
                plt.axhline(y=prob1, color='r', linestyle='dashed')
+               plt.gca().spines[['right','top']].set_visible(False)
                plt.xlabel("Iterations")
                plt.ylabel("Probability")
                plt.title(f"Total Probability of {val1} outcome from coin flip; n={n}, runs={runs}", size=10)
             else:
                 plt.figure(2)
                 plt.plot(x_valer, y_valer2, c=np.random.rand(3,))
-                plt.axhline(y=prob2, color='r', linestyle='dashed')
+                plt.axhline(y=prob2, color='r', linestyle='--')
+                plt.gca().spines[['right','top']].set_visible(False)
                 plt.xlabel("Iterations")
                 plt.ylabel("Probability")
                 plt.title(f"Total Probability of {val2} outcome from coin flip; n={n}, runs={runs}", size=10)

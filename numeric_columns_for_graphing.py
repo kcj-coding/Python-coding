@@ -48,6 +48,41 @@ def number_format(num):
         return 0
     else:
         return round(num,2)
+   
+# qq plot from https://stackoverflow.com/questions/13865596/quantile-quantile-plot-using-scipy
+def QQ_plot(data, save_loc):
+
+    # Sort as increasing
+    y = np.sort(data)
+    
+    # Compute sample mean and std
+    mean, std = np.mean(y), np.std(y)
+    
+    # Compute set of Normal quantiles
+    ppf = stats.norm(loc=mean, scale=std).ppf # Inverse CDF
+    N = len(y)
+    x = [ppf( i/(N+2) ) for i in range(1,N+1)]
+
+    # Make the QQ scatter plot
+    fig, ax = plt.subplots()
+    ax.scatter(x, y)
+    
+    # Plot diagonal line
+    dmin, dmax = np.min([x,y]), np.max([x,y])
+    diag = np.linspace(dmin, dmax, 1000)
+    ax.plot(diag, diag, color='red', linestyle='--')
+    plt.gca().set_aspect('equal')
+    
+    # Add labels
+    ax.set_xlabel('Normal quantiles')
+    ax.set_ylabel('Sample quantiles')
+    
+    #set size of graph
+    cmsize=1/2.54
+    fig.set_size_inches(30*cmsize, 15*cmsize)
+    
+    #save plot
+    plt.savefig(save_loc, dpi=400, bbox_inches='tight')
     
 def line_graph(x,y,xx,yy,title,file_loc):
     fig, ax = plt.subplots()
@@ -80,8 +115,8 @@ def line_graph(x,y,xx,yy,title,file_loc):
     #ax.set_axisbelow(True) # to put gridlines at back
     #ax.grid(linestyle='--',color='#CECECE')
     ax.tick_params(axis='y',labelsize=8)
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
+    ax.spines[['right','top']].set_visible(False)
+    #ax.spines['right'].set_visible(False)
     
     #set size of graph
     cmsize=1/2.54
@@ -102,14 +137,11 @@ if (graph_by_column_name == True and graph_by_column_number==True):
     
 start_time = time.time()
 
-# df = pd.DataFrame({"val":[1,2,3], "val_str":["1","2","3"]})
+df = pd.DataFrame({"data":[x for x in range(1,11,1)], "typer":["a","b"]*5})
 
-df = pd.DataFrame({"val":[random.randint(0,1000) for p in range(0,900,1)], "val_str":np.repeat(["1","2","3"],300)})
+#df = pd.DataFrame({"val":[random.randint(0,1000) for p in range(0,900,1)], "val_str":np.repeat(["1","2","3"],300)})
 
 #df.columns = df.columns.str.replace("[^A-Za-z0-9]","", regex=True) # remove special characters from column names
-
-# turn str into factors
-df_f = pd.factorize(df['val_str'])[0]
 
 df_old = df
 
@@ -264,6 +296,9 @@ if graph_by_column_name == True:
         # save
         plt.savefig(f'{folder}/{str(i)}/{str(i)}'+'_boxplot.png', dpi=400, bbox_inches='tight')
         
+        # qq plot
+        QQ_plot(df_num[i],f'{folder}/{str(i)}/{str(i)}'+'_qqplot.png')
+        
         for j in df_num.columns:
             #tst = df_cor['correlation'][(df_cor['from']==i) & (df_cor['to']==j)].values[0]
             try:
@@ -328,6 +363,29 @@ if graph_by_column_name == True:
                     # graph the data
                     #line_graph(df_num[i],df_num[j],xx=i,yy=j,title="Graph of "+i+" against "+j+" || LR: y="+str(lr_coef)+"x+"+str(lr_int)+" || PLY: y="+str(ply_coef1)+"x1+"+str(ply_coef2)+"x2+"+str(ply_coef3)+"x3+"+str(ply_int)+"\n lr_rsq: "+str(round(r_sq_lr,3))+"; ply_rsq: "+str(round(r_sq_ply,3))+" || target corr: "+str(corr_threshold)+"; actual corr: "+str(round(abs(df_cor['correlation'][(df_cor['from']==i) & (df_cor['to']==j)].values[0]),3)), file_loc=f'{folder}/{str(i)}/{str("Columns")}/{str(i)}_{str(j)}'+'_.png')
                     line_graph(df_num[i],df_num[j],xx=i,yy=j,title="Graph of "+i+" against "+j+" || LR: y="+str(lr_coef)+"x+"+str(lr_int)+" || PLY: y="+str(ply_coef1)+"x+"+str(ply_coef2)+"x\u00b2+"+str(ply_coef3)+"x\u00b3+"+str(ply_int)+"\n lr_rsq: "+str(round(r_sq_lr,3))+"; ply_rsq: "+str(round(r_sq_ply,3))+" || target corr: "+str(corr_threshold)+"; actual corr: "+str(round(abs(df_cor['correlation'][(df_cor['from']==i) & (df_cor['to']==j)].values[0]),3)), file_loc=f'{folder}/{str(i)}/{str("Columns")}/{str(i)}_{str(j)}'+'_.png')
+                    
+                    # boxplot of both columns
+                    ttt = stats.ttest_ind(df_num[i],df_num[j]) # t-test
+                    my_dict = {str(i): df_num[i], str(j): df_num[j]}
+                    
+                    fig, ax = plt.subplots()
+                    ax.boxplot(my_dict.values(), labels=my_dict.keys())
+                    ax.grid(linestyle='',color='#CECECE')
+                    ax.spines[['right','top']].set_visible(False)
+                    ax.set_xlabel(str(i),size=10)
+                    ax.set_ylabel("Number", size=10)
+                    ax.set_title('Title'+" for column "+str(i)+" Mean:"+str(round(mean,3))+
+                                 "\nt-stat: "+str(ttt[0])+"; p-value: "+str(ttt[1]),size=12)
+                    
+                    # annotate graph
+                    #for x in zip()
+                    
+                    #set size of graph
+                    cmsize=1/2.54
+                    fig.set_size_inches(30*cmsize, 15*cmsize)
+                    
+                    # save
+                    plt.savefig(f'{folder}/{str(i)}/{str("Columns")}/{str(i)}'+'_boxplot.png', dpi=400, bbox_inches='tight')
                     
                     # k-means
             except:
@@ -438,6 +496,8 @@ if graph_by_column_number == True:
         # save
         plt.savefig(f'{folder}/{str(df_num.columns[i])}/{str(df_num.columns[i])}'+'_boxplot.png', dpi=400, bbox_inches='tight')# plot histogram and boxplot of this data
         
+        # qq plot
+        QQ_plot(df_num[df_num.columns[[i]]],f'{folder}/{str(df_num.columns[i])}/{str(df_num.columns[i])}'+'_qqplot.png')
         
         for j in range(0,len(df_num.columns),1):
             try:
@@ -502,6 +562,29 @@ if graph_by_column_number == True:
                     # graph the data
                     #line_graph(df_num[df_num.columns[i]],df_num[df_num.columns[j]],xx=df_num.columns[i],yy=df_num.columns[j],title="Graph of "+df_num.columns[i]+" against "+df_num.columns[j]+" || LR: y="+str(lr_coef)+"x+"+str(lr_int)+" || PLY: y="+str(ply_coef1)+"x1+"+str(ply_coef2)+"x2+"+str(ply_coef3)+"x3+"+str(ply_int)+"\n lr_rsq: "+str(round(r_sq_lr,3))+"; ply_rsq: "+str(round(r_sq_ply,3))+" || target corr: "+str(corr_threshold)+"; actual corr: "+str(round(abs(df_cor['correlation'][(df_cor['from']==df_num.columns[i]) & (df_cor['to']==df_num.columns[j])].values[0]),3)), file_loc=f'{folder}/{str(df_num.columns[i])}/{str("Columns")}/{str(df_num.columns[i])}_{str(df_num.columns[j])}'+'_.png')
                     line_graph(df_num[df_num.columns[i]],df_num[df_num.columns[j]],xx=df_num.columns[i],yy=df_num.columns[j],title="Graph of "+df_num.columns[i]+" against "+df_num.columns[j]+" || LR: y="+str(lr_coef)+"x+"+str(lr_int)+" || PLY: y="+str(ply_coef1)+"x+"+str(ply_coef2)+"x\u00b2+"+str(ply_coef3)+"x\u00b3+"+str(ply_int)+"\n lr_rsq: "+str(round(r_sq_lr,3))+"; ply_rsq: "+str(round(r_sq_ply,3))+" || target corr: "+str(corr_threshold)+"; actual corr: "+str(round(abs(df_cor['correlation'][(df_cor['from']==df_num.columns[i]) & (df_cor['to']==df_num.columns[j])].values[0]),3)), file_loc=f'{folder}/{str(df_num.columns[i])}/{str("Columns")}/{str(df_num.columns[i])}_{str(df_num.columns[j])}'+'_.png')
+                    
+                    # boxplot of both columns
+                    ttt = stats.ttest_ind(df_num[df_num.columns[i]],df_num[df_num.columns[j]]) # t-test
+                    my_dict = {str(df_num.columns[i]): df_num[df_num.columns[i]], str(df_num.columns[j]): df_num[df_num.columns[j]]}
+                    
+                    fig, ax = plt.subplots()
+                    ax.boxplot(my_dict.values(), labels=my_dict.keys())
+                    ax.grid(linestyle='',color='#CECECE')
+                    ax.spines[['right','top']].set_visible(False)
+                    ax.set_xlabel(str(i),size=10)
+                    ax.set_ylabel("Number", size=10)
+                    ax.set_title('Title'+" for column "+str(i)+" Mean:"+str(round(mean,3))+
+                                 "\nt-stat: "+str(ttt[0])+"; p-value: "+str(ttt[1]),size=12)
+                    
+                    # annotate graph
+                    #for x in zip()
+                    
+                    #set size of graph
+                    cmsize=1/2.54
+                    fig.set_size_inches(30*cmsize, 15*cmsize)
+                    
+                    # save
+                    plt.savefig(f'{folder}/{str(df_num.columns[i])}/{str("Columns")}/{str(df_num.columns[i])}'+'_boxplot.png', dpi=400, bbox_inches='tight')
                     
                     # k-means
             except:
