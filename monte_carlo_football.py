@@ -151,6 +151,39 @@ dff_lng = df_teams_f.pivot(index="team", columns="rank", values="pct")
 dff_lng = dff_lng.fillna(0)
 dff_lng['team'] = dff_lng.index#teams
 
+# drop team for heatmap, as team labels
+dff_lng_mp = dff_lng.drop(columns=["team"]) # have just the pct by rank for the heatmap, team is index
+
+# make heatmap
+pct_np = dff_lng_mp.to_numpy()
+
+#set size of graph
+cmsize=1/2.54
+
+fig, ax = plt.subplots(figsize=(30*cmsize, 15*cmsize))
+im = ax.imshow(pct_np, vmin=0, vmax=max(df_teams_f['pct']), cmap="Reds")
+
+# Show all ticks and label them with the respective list entries
+ax.set_xticks(range(len(teams)), labels=range(1,len(teams)+1),
+              rotation=45, ha="right", rotation_mode="anchor")
+ax.set_yticks(range(len(teams)), labels=teams)#range(0,len(teams)))
+
+# Loop over data dimensions and create text annotations.
+for i in range(len(teams)):
+    for j in range(len(teams)):
+        text = ax.text(j, i, pct_np[i, j],
+                       ha="center", va="center", color="w")
+        
+ax.spines[['top','right']].set_visible(False)
+ax.set_xlabel("Rank",size=10)
+ax.set_ylabel("Team", size=10)
+ax.set_title('Title',size=12)
+
+#ax.set_title("Title")
+fig.tight_layout()
+
+plt.show()
+
 
 end_time = time.time()
 print("runtime:",end_time-start_time,"seconds")
