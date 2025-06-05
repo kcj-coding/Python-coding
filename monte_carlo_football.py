@@ -21,61 +21,91 @@ loss_chg = [-0.1] # losing increases probability of losing again
 
 # teams play all teams twice except themselves
 
-n_runs = 500
+n_runs = 50
 
 goals = [0,1,2,3,4,5,6]
 goals_prob = [0.5,0.4,0.3,0.2,0.1,0.03,0.01] # unlikely to score high number of goals
 
 start_time = time.time()
 
+# create matches
+matches = pd.DataFrame()
+for h in range(len(teams)):
+    for a in range(len(teams)):
+        if teams[h] != teams[a]:
+            match = pd.DataFrame({'home':[teams[h]], 'away':[teams[a]]})
+            matches = pd.concat([matches,match])
+
+matches = matches.reset_index()
+matches = matches.drop(columns=["index"])
+
+# reorder so not all of home against different away
+new_order = random.sample(range(0,len(matches)),len(matches))
+
+matches_new = pd.DataFrame()
+for x in new_order:
+    xx = matches[matches.index.isin([x])]
+    matches_new = pd.concat([matches_new,xx])
+
+
 res = pd.DataFrame()
 
 for run in range(n_runs):
-    for h in range(len(teams)):
-        for a in range(len(teams)):
-            if teams[h] != teams[a]:
+    team_probs1 = team_probs.copy() # copy so does not update existing values
+    team_probs1 = team_probs[:] # copy so does not update existing values
+    for i in range(len(matches_new)):
+    #for h in range(len(teams)):
+    #    for a in range(len(teams)):
+    #        if teams[h] != teams[a]:
                 #print(teams[h]," v ", teams[a])
                 #print("Home: ",teams[h], "Away: ",teams[a])
                 
                 # get result probability - create custom probabilities from defined starting points
                 
-                h_team_prob = team_probs[h] * play_prob[0]
-                #outcome_prob_h = [x*h_team_prob for x in outcome_prob]
-                a_team_prob = team_probs[a] * play_prob[1]
-                
-                outcome_prob_h = [h_team_prob,max(h_team_prob*0.2, a_team_prob*0.2),a_team_prob]
-                
-                result = random.choices(outcomes,weights=outcome_prob_h)[0]
-                
-                if result == "W":
-                    a_score = random.choices(goals[0:5],weights=goals_prob[0:5])[0]#random.randint(0,5)
-                    h_score = min(6,a_score+random.choices(goals[1:6],weights=goals_prob[1:6])[0]) # ensures score is higher than away
-                    # team_w prob increases
-                    # team_a prob decreases
-                    team_probs[h] = min(0.95,(1+win_chg[0]) * team_probs[h])
-                    team_probs[a] = max(0.01,(1+loss_chg[0]) * team_probs[a])
-                elif result == "L":
-                    a_score = random.choices(goals[1:6],weights=goals_prob[1:6])[0]#random.randint(0,5)
-                    h_score = max(0,a_score-random.choices(goals[1:6],weights=goals_prob[1:6])[0]) # ensures score is lower than away
-                    # team_w prob decreases
-                    # team_a prob increases
-                    team_probs[h] = max(0.01,(1+loss_chg[0]) * team_probs[h])
-                    team_probs[a] = min(0.95,(1+win_chg[0]) * team_probs[a])
-                else:
-                    a_score = random.choices(goals[0:4],weights=goals_prob[0:4])[0]#random.randint(0,5)
-                    h_score = a_score
-                
-                exp_result = ["W" if h_team_prob > a_team_prob else "L"][0]
-                
-                h_points = [3 if result=="W" else 0 if result=="L" else 1][0]
-                a_points = [0 if result=="W" else 3 if result=="L" else 1][0]
-                
-                #print(result)
-                       
-                # outcome probability
-                dff = pd.DataFrame({'run':[run],'home':[teams[h]],'away':[teams[a]],'probs':[outcome_prob_h], 'result':[result], 'score':[str(h_score)+":"+str(a_score)],'goals_h':[h_score],'goals_a':[a_score],'exp_result':[exp_result],
-                                    'h_prob':[team_probs[h]], 'a_prob':[team_probs[a]], 'h_points':[h_points], 'a_points':[a_points]})
-                res = pd.concat([res,dff])
+        h_team = matches_new['home'][i]
+        a_team = matches_new['away'][i]
+        
+        # find number in teams
+        h_loc = [ii for ii, x in enumerate(teams) if x == h_team][0]
+        a_loc = [ii for ii, x in enumerate(teams) if x == a_team][0]
+        
+        h_team_prob = team_probs1[h_loc] * play_prob[0]
+        #outcome_prob_h = [x*h_team_prob for x in outcome_prob]
+        a_team_prob = team_probs1[a_loc] * play_prob[1]
+        
+        outcome_prob_h = [h_team_prob,max(h_team_prob*0.2, a_team_prob*0.2),a_team_prob]
+        
+        result = random.choices(outcomes,weights=outcome_prob_h)[0]
+        
+        if result == "W":
+            a_score = random.choices(goals[0:5],weights=goals_prob[0:5])[0]#random.randint(0,5)
+            h_score = min(6,a_score+random.choices(goals[1:6],weights=goals_prob[1:6])[0]) # ensures score is higher than away
+            # team_w prob increases
+            # team_a prob decreases
+            team_probs1[h_loc] = min(0.95,(1+win_chg[0]) * team_probs1[h])
+            team_probs1[a_loc] = max(0.01,(1+loss_chg[0]) * team_probs1[a])
+        elif result == "L":
+            a_score = random.choices(goals[1:6],weights=goals_prob[1:6])[0]#random.randint(0,5)
+            h_score = max(0,a_score-random.choices(goals[1:6],weights=goals_prob[1:6])[0]) # ensures score is lower than away
+            # team_w prob decreases
+            # team_a prob increases
+            team_probs1[h_loc] = max(0.01,(1+loss_chg[0]) * team_probs1[h])
+            team_probs1[a_loc] = min(0.95,(1+win_chg[0]) * team_probs1[a])
+        else:
+            a_score = random.choices(goals[0:4],weights=goals_prob[0:4])[0]#random.randint(0,5)
+            h_score = a_score
+        
+        exp_result = ["W" if h_team_prob > a_team_prob else "L"][0]
+        
+        h_points = [3 if result=="W" else 0 if result=="L" else 1][0]
+        a_points = [0 if result=="W" else 3 if result=="L" else 1][0]
+        
+        #print(result)
+               
+        # outcome probability
+        dff = pd.DataFrame({'run':[run],'home':[teams[h_loc]],'away':[teams[a_loc]],'probs':[outcome_prob_h], 'result':[result], 'score':[str(h_score)+":"+str(a_score)],'goals_h':[h_score],'goals_a':[a_score],'exp_result':[exp_result],
+                            'h_prob':[team_probs1[h_loc]], 'a_prob':[team_probs1[a_loc]], 'h_points':[h_points], 'a_points':[a_points]})
+        res = pd.concat([res,dff])
         
 # at the end, want to track team positions by run
 df_teams = pd.DataFrame()
