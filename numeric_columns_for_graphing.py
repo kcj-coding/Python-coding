@@ -211,9 +211,13 @@ if graph_by_column_name == True:
     
         mean = df_num[i].mean()
         std = df_num[i].std()
+        #iqr = np.subtract(*np.percentile(df_num[i], [75, 25]))
+        iqr = number_format(df_num[i].quantile(0.75) - df_num[i].quantile(0.25))
         
         # what percentage of values are captured within the range 
         pct_val = round((len(df_num[(df_num[i] < mean+(2*std)) & (df_num[i] > mean-(2*std))])/len(df_num[i]))*100,3)
+        
+        graph_title = str('Title'+" for column "+str(i)+" Mean:"+str(number_format(mean))+"; percentage of values captured within range:"+str(number_format(pct_val))+"%"+"\nn="+str(len(df_num[i]))+"; sd="+str(number_format(std))+"; IQR="+str(iqr))
         
         #### histogram
         fig, ax = plt.subplots()
@@ -228,7 +232,7 @@ if graph_by_column_name == True:
         ax.spines['right'].set_visible(False)
         ax.set_xlabel(str(i),size=10)
         ax.set_ylabel("Frequency", size=10)
-        ax.set_title('Title'+" for column "+str(i)+" Mean:"+str(round(mean,3))+"\n percentage of values captured within range:"+str(round(pct_val,3))+"%",size=12)
+        ax.set_title(graph_title, size=12)
         
         # annotate graph
         #for x in zip()
@@ -260,7 +264,7 @@ if graph_by_column_name == True:
         ax.spines['right'].set_visible(False)
         ax.set_xlabel(str(i),size=10)
         ax.set_ylabel("Frequency", size=10)
-        ax.set_title('Title'+" for column "+str(i)+" Mean:"+str(round(mean,3))+"\n percentage of values captured within range:"+str(round(pct_val,3))+"%",size=12)
+        ax.set_title(graph_title,size=12)
         
         # annotate graph
         #for x in zip()
@@ -279,12 +283,15 @@ if graph_by_column_name == True:
         
         #ax.boxplot(x=df_num[i], labels=labels, showmeans = False)
         df_num[[i]].boxplot(ax=ax)
+        plt.axhline(mean,linestyle="solid",c="red")
+        plt.axhline(mean+(2*std),linestyle="dashed",c="red")
+        plt.axhline(mean-(2*std),linestyle="dashed",c="red")
         ax.grid(linestyle='',color='#CECECE')
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
         ax.set_xlabel(str(i),size=10)
         ax.set_ylabel("Number", size=10)
-        ax.set_title('Title'+" for column "+str(i)+" Mean:"+str(round(mean,3)),size=12)
+        ax.set_title(graph_title,size=12)
         
         # annotate graph
         #for x in zip()
@@ -413,10 +420,14 @@ if graph_by_column_number == True:
             os.makedirs(f'{folder}/{str(df_num.columns[i])}', exist_ok=True)
     
         mean = df_num[df_num.columns[i]].mean()
-        std = df_num[df_num.columns[i]].std()
+        std = number_format(df_num[df_num.columns[i]].std())
+        #iqr = np.subtract(*np.percentile(df_num[df_num.columns[i]], [75, 25]))
+        iqr = number_format(df_num[df_num.columns[i]].quantile(0.75) - df_num[df_num.columns[i]].quantile(0.25))
         
         # what percentage of values are captured within the range
         pct_val = round((len(df_num[(df_num[df_num.columns[i]] < mean+(2*std)) & (df_num[df_num.columns[i]] > mean-(2*std))])/len(df_num[df_num.columns[i]]))*100,3)
+        
+        graph_title = str('Title'+" for column "+str(df_num.columns[i])+" Mean:"+str(number_format(mean))+"; percentage of values captured within range:"+str(number_format(pct_val))+"%"+"\nn="+str(len(df_num[df_num.columns[i]]))+"; sd="+str(std)+"; IQR="+str(iqr))
         
         #### histogram
         fig, ax = plt.subplots()
@@ -431,7 +442,7 @@ if graph_by_column_number == True:
         ax.spines['right'].set_visible(False)
         ax.set_xlabel(str(i),size=10)
         ax.set_ylabel("Frequency", size=10)
-        ax.set_title('Title'+" for column "+str(df_num.columns[i])+" Mean:"+str(round(mean,3))+"\n percentage of values captured within range:"+str(round(pct_val,3))+"%",size=12)
+        ax.set_title(graph_title,size=12)
         
         
         #set size of graph
@@ -461,7 +472,7 @@ if graph_by_column_number == True:
         ax.spines['right'].set_visible(False)
         ax.set_xlabel(str(i),size=10)
         ax.set_ylabel("Frequency", size=10)
-        ax.set_title('Title'+" for column "+str(df_num.columns[i])+" Mean:"+str(round(mean,3))+"\n percentage of values captured within range:"+str(round(pct_val,3))+"%",size=12)
+        ax.set_title(graph_title,size=12)
         
         # annotate graph
         #for x in zip()
@@ -479,12 +490,15 @@ if graph_by_column_number == True:
         
         #ax.boxplot(x=df_num[i], labels=labels, showmeans = False)
         df_num[df_num.columns[[i]]].boxplot(ax=ax)
+        plt.axhline(mean,linestyle="solid",c="red")
+        plt.axhline(mean+(2*std),linestyle="dashed",c="red")
+        plt.axhline(mean-(2*std),linestyle="dashed",c="red")
         ax.grid(linestyle='',color='#CECECE')
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
         ax.set_xlabel(str(i),size=10)
         ax.set_ylabel("Number", size=10)
-        ax.set_title('Title'+" for column "+str(df_num.columns[i])+" Mean:"+str(round(mean,3)),size=12)
+        ax.set_title(graph_title,size=12)
         
         # annotate graph
         #for x in zip()
@@ -495,9 +509,9 @@ if graph_by_column_number == True:
         
         # save
         plt.savefig(f'{folder}/{str(df_num.columns[i])}/{str(df_num.columns[i])}'+'_boxplot.png', dpi=400, bbox_inches='tight')# plot histogram and boxplot of this data
-        
+
         # qq plot
-        QQ_plot(df_num[df_num.columns[[i]]],f'{folder}/{str(df_num.columns[i])}/{str(df_num.columns[i])}'+'_qqplot.png')
+        QQ_plot(df_num[df_num.columns[i]],f'{folder}/{str(df_num.columns[i])}/{str(df_num.columns[i])}'+'_qqplot.png')
         
         for j in range(0,len(df_num.columns),1):
             try:
