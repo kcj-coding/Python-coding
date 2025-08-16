@@ -1,4 +1,5 @@
 # monte carlo estimate
+import math
 import random
 import numpy as np
 import pandas as pd
@@ -76,7 +77,7 @@ for column in df.columns:
         
         
         unq_cat = len(labels) # get count of how many unique group types
-        fig, ax = plt.subplots(unq_cat)
+        fig, ax = plt.subplots(unq_cat, sharex=True)
         
         # for each group, make a separate graph
         for axi in range(0,unq_cat,1):
@@ -139,6 +140,88 @@ for column in df.columns:
         # annotate graph
         #for x in zip()
         ax[0].set_title("Title",size=10)
+        
+        #set size of graph
+        cmsize=1/2.54
+        fig.set_size_inches(30*cmsize, 15*cmsize)
+        
+        plt.show()
+        
+        ########## plot scatter by group_var as multiple rows and columns of graphs 
+
+        # get equations by type
+        
+        unq_cat = len(labels) # get count of how many unique group types this is number of columns
+        num_rows = math.ceil(unq_cat / 2)
+        fig, ax = plt.subplots(num_rows, 2, sharex = True)
+        ax = ax.flatten()
+        # for each group, make a separate graph
+        for axi in range(0,unq_cat,1):
+            ax[axi].scatter(df_tst[x_name][df_tst[group_var]==labels[axi]], df_tst[column][df_tst[group_var]==labels[axi]])
+            
+            xxx = df_tst[x_name][df_tst[group_var]==labels[axi]]
+            yyy = df_tst[column][df_tst[group_var]==labels[axi]]
+            
+            # make smooth linear and polynominal estimates
+            
+            # lr
+            poly_lr = np.polyfit(xxx, yyy, deg=1, rcond=None, full=False, w=None, cov=False)
+            p_lr = np.poly1d(poly_lr)
+            p_lr = r2_score(yyy, p_lr(xxx))
+            xs = np.linspace(min(xxx), max(xxx), 100)
+            ys = poly_lr[0] * xs + poly_lr[1]
+            ax[axi].plot(xs, ys, color='blue')#, label=f'$({poly_lr[0]:.2f})x + ({poly_lr[1]:.2f}); r^2={p_lr}$')
+            
+            
+            # poly
+            poly_ply = np.polyfit(xxx, yyy, deg=3, rcond=None, full=False, w=None, cov=False)
+            p_ply= np.poly1d(poly_ply)
+            p_ply = r2_score(yyy, p_ply(xxx))
+            xs_ply = np.linspace(min(xxx), max(xxx), 100)
+            ys_ply = poly_ply[0] * xs ** 3 + poly_ply[1] * xs ** 2 + poly_ply[2] * xs + poly_ply[3]
+            ax[axi].plot(xs_ply, ys_ply, color='red')#, label=f'$({poly_ply[0]:.2f})x^3+({poly_ply[1]:.2f})x^2+({poly_ply[2]:.2f})x + ({poly_ply[3]:.2f}); r^2={p_ply}$')
+            
+            # annotate equations
+            #ax[axi].annotate(min(xxx),min(yyy),)
+            
+            ax[axi].annotate(f'y=$({poly_lr[0]:.2f})x + ({poly_lr[1]:.2f})$; $r^2={p_lr:.2f}$',
+                        xy=(np.mean(xxx),max(yyy)),
+                        xytext=(15, 0),  # 4 points vertical offset.
+                        textcoords='offset points',
+                        ha='center', va='bottom', color="blue")
+            
+            ax[axi].annotate(f'y=$({poly_ply[0]:.2f})x^3+({poly_ply[1]:.2f})x^2+({poly_ply[2]:.2f})x + ({poly_ply[3]:.2f})$; $r^2={p_ply:.2f}$',
+                        xy=(np.mean(xxx),min(yyy)),
+                        xytext=(0, 0),  # 4 points vertical offset.
+                        textcoords='offset points',
+                        ha='center', va='bottom', color="red")
+            
+        
+            #ax.boxplot(x=df_num[i], labels=labels, showmeans = False)
+            #ax.boxplot(collection, tick_labels=labels)
+            ax[axi].grid(linestyle='',color='#CECECE')
+            ax[axi].spines['top'].set_visible(False)
+            ax[axi].spines['right'].set_visible(False)
+            #ax[axi].set_xlabel(str(group_var),size=10)
+            #ax[axi].set_ylabel("Number", size=10)
+            #ax[axi].set_title('Title',size=12)
+            ax[axi].set_title(f"\n{str(labels[axi])}",size=10, loc="center")
+            
+            # only show xlabs for bottom graphs
+            # series for nums
+            xx = [i for i in range(unq_cat-2, unq_cat,1)]
+            if axi not in xx:
+                ax[axi].get_xaxis().set_visible(False)
+                ax[axi].set_xlabel=""
+                ax[axi].xlabs=""
+                
+        # Hide unused subplots
+        for j in range(unq_cat + 1, len(ax)):
+         ax[j].axis('off')
+        
+        # annotate graph
+        #for x in zip()
+        #ax[0].set_title("Title",size=10)
         
         #set size of graph
         cmsize=1/2.54
