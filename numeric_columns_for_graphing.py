@@ -223,7 +223,8 @@ if graph_by_column_name == True:
         fig, ax = plt.subplots()
         
         #ax.boxplot(x=df_num[i], labels=labels, showmeans = False)
-        df_num[[i]].hist(ax=ax)
+        #df_num[[i]].hist(ax=ax)
+        plt.hist(df_num[[i]], edgecolor="white")
         plt.axvline(mean,linestyle="solid",c="red")
         plt.axvline(mean+(2*std),linestyle="dashed",c="red")
         plt.axvline(mean-(2*std),linestyle="dashed",c="red")
@@ -254,7 +255,8 @@ if graph_by_column_name == True:
         fig, ax = plt.subplots()
         
         #ax.boxplot(x=df_num[i], labels=labels, showmeans = False)
-        df_num[[i]].hist(ax=ax, density=True)
+        #df_num[[i]].hist(ax=ax, density=True)
+        plt.hist(df_num[[i]], density=True, edgecolor="white")
         plt.plot(x_pdf, stats.norm.pdf(x_pdf, *param), color = 'black')
         plt.axvline(mean,linestyle="solid",c="red")
         plt.axvline(mean+(2*std),linestyle="dashed",c="red")
@@ -433,7 +435,8 @@ if graph_by_column_number == True:
         fig, ax = plt.subplots()
         
         #ax.boxplot(x=df_num[i], labels=labels, showmeans = False)
-        df_num[df_num.columns[i]].hist(ax=ax)
+        #df_num[df_num.columns[i]].hist(ax=ax)
+        plt.hist(df_num[df_num.columns[i]], edgecolor="white")
         plt.axvline(mean,linestyle="solid",c="red")
         plt.axvline(mean+(2*std),linestyle="dashed",c="red")
         plt.axvline(mean-(2*std),linestyle="dashed",c="red")
@@ -462,7 +465,8 @@ if graph_by_column_number == True:
         fig, ax = plt.subplots()
         
         #ax.boxplot(x=df_num[i], labels=labels, showmeans = False)
-        df_num[df_num.columns[i]].hist(ax=ax, density=True)
+        #df_num[df_num.columns[i]].hist(ax=ax, density=True)
+        plt.hist(df_num[df_num.columns[i]], density=True, edgecolor="white")
         plt.plot(x_pdf, stats.norm.pdf(x_pdf, *param), color = 'black')
         plt.axvline(mean,linestyle="solid",c="red")
         plt.axvline(mean+(2*std),linestyle="dashed",c="red")
