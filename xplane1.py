@@ -1,10 +1,4 @@
 
-# to do
-# add in pdf to histogram
-# add in correlation and only graph compared columns if > some value
-# save view of all histograms? in main folder
-
-
 #import win32com.client # to interact with windows applications
 import pandas as pd
 #import scipy.stats as stats
@@ -71,7 +65,7 @@ def line_graph(x,y,xx,yy,title,file_loc):
 
     for i in pd.Series(dfs['type']).drop_duplicates().tolist():
             try:
-               ax.scatter(x[dfs['type']==i], y[dfs['type']==i], label="Product "+i, color='#'+str(hex(random.randint(0,16777215)))[2:])
+               ax.scatter(x[dfs['type']==i], y[dfs['type']==i], label="Type: "+i, color='#'+str(hex(random.randint(0,16777215)))[2:])
             except:
                    pass
     
@@ -107,6 +101,57 @@ def line_graph(x,y,xx,yy,title,file_loc):
     #plt.show()
     plt.close()
     
+def scatter_graph(x,y,cc,xx,yy,title,file_loc):
+    fig, ax = plt.subplots()
+    
+    # Plot each bar plot. Note: manually calculating the 'dodges' of the bars
+    #ax = plt.axes()
+    
+    #ax.plot(np.arange(0,len(df.data[df.type=='a'])), df.c_number[df.type=='a'], label='Product a', color='#CD2456')
+    #ax.plot(np.arange(0,len(df.data[df.type=='b'])), df.c_number[df.type=='b'], label='Product b', color='#14022E')
+    
+    #ax.scatter(x,y,alpha=0.5, c="black")
+    #ax.plot(x,y)
+
+    sc = ax.scatter(x, y, c=cc, cmap="jet")
+
+    
+    # Customise some display properties for line graph
+    ax.set_ylabel(yy,size=8)
+    #ax.set_ylim(0,200) #(0,max(df.Sales)+10)
+    #ax.set_yticks(ax.get_yticks().astype(np.int64))
+    #ax.set_yticklabels(ax.get_yticks().astype(np.int64),rotation='horizontal',size=8)
+    #ax.set_xlim(0,8)
+    ax.set_xlabel(xx,size=8)
+    ax.set_title(title,size=9)
+    #ax.set_xticks(np.arange(0,len(df.data[df.type=='a'])))    # This ensures we have one tick per year, otherwise we get fewer
+    #ax.set_xticklabels(np.arange(0,len(df.data[df.type=='a'])), rotation='horizontal',size=8)
+    #ax.fill(df.Doy[df.Product=='A'],df.Sales[df.Product=='A']-5,df.Sales[df.Product=='A']+5,color='k', alpha=.15)
+    #ax.set_xticks([])
+    #ax.set_yticks([])
+    #ax.legend(loc='upper left',fontsize=8)
+    #ax.legend(*[*zip(*{l:h for h,l in zip(*ax.get_legend_handles_labels())}.items())][::-1])
+    #ax.set_axisbelow(True) # to put gridlines at back
+    #ax.grid(linestyle='--',color='#CECECE')
+    ax.tick_params(axis='y',labelsize=8)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    plt.colorbar(sc, label="Altitude")
+    
+     #im = ax.imshow(dfs["p-alt,ftMSL"], cmap='jet')
+    #fig.colorbar(im, orientation='horizontal')
+    
+    #set size of graph
+    cmsize=1/2.54
+    fig.set_size_inches(30*cmsize, 15*cmsize)
+    
+    #save plot
+    plt.savefig(file_loc, dpi=400, bbox_inches='tight')
+    
+    # Ask Matplotlib to show the plot
+    #plt.show()
+    plt.close()
+    
 def dual_line_graph(x,y,xx,yy,y1,yy1,title,file_loc):
     fig, ax = plt.subplots()
     
@@ -124,8 +169,10 @@ def dual_line_graph(x,y,xx,yy,y1,yy1,title,file_loc):
     ax1.plot(x,y1,'r-')
     
     # Customise some display properties for line graph
-    ax.set_ylabel(yy,size=8)
-    ax1.set_ylabel(yy1,size=8)
+    ax.set_ylabel(yy,size=8, color="b")
+    ax.tick_params(axis='y', colors='b')
+    ax1.set_ylabel(yy1,size=8, color="r")
+    ax1.tick_params(axis='y', colors='r')
     #ax.set_ylim(0,200) #(0,max(df.Sales)+10)
     #ax.set_yticks(ax.get_yticks().astype(np.int64))
     #ax.set_yticklabels(ax.get_yticks().astype(np.int64),rotation='horizontal',size=8)
@@ -137,8 +184,8 @@ def dual_line_graph(x,y,xx,yy,y1,yy1,title,file_loc):
     #ax.fill(df.Doy[df.Product=='A'],df.Sales[df.Product=='A']-5,df.Sales[df.Product=='A']+5,color='k', alpha=.15)
     #ax.set_xticks([])
     #ax.set_yticks([])
-    ax.legend(loc='upper left',fontsize=8)
-    ax.legend(*[*zip(*{l:h for h,l in zip(*ax.get_legend_handles_labels())}.items())][::-1])
+    #ax.legend(loc='upper left',fontsize=8)
+    #ax.legend(*[*zip(*{l:h for h,l in zip(*ax.get_legend_handles_labels())}.items())][::-1])
     #ax.set_axisbelow(True) # to put gridlines at back
     #ax.grid(linestyle='--',color='#CECECE')
     ax.tick_params(axis='y',labelsize=8)
@@ -220,7 +267,7 @@ def hist_graph(df,xx,bins,savename):
     # what percentage of values are captured within the range 
     pct_val = round((len(df[(df[xx] < mean+(2*std)) & (df[xx] > mean-(2*std))])/len(df[xx]))*100,3)
     
-    graph_title = str('Title'+" for column "+str(xx)+" Mean:"+str(number_format(mean))+"; percentage of values captured within range:"+str(number_format(pct_val))+"%"+"\nn="+str(len(df[xx]))+"; sd="+str(number_format(std))+"; IQR="+str(iqr))
+    graph_title = str('Title'+" for "+str(xx)+" Mean:"+str(number_format(mean))+"; percentage of values captured within range:"+str(number_format(pct_val))+"%"+"\nn="+str(len(df[xx]))+"; sd="+str(number_format(std))+"; IQR="+str(iqr))
     
     #### histogram
     fig, ax = plt.subplots()
@@ -283,7 +330,15 @@ df.columns = df.columns.str.replace("[\s+]","", regex=True) # remove multiple wh
 column_names = df.columns
 
 column_name_select = ["X_real._time", "X_totl._time", "X_Vind._kias", "Vtrue._ktas", "X_alt.ftmsl", "pitch.__deg", "hding.__mag", "X__lat.__deg", "X__lon.__deg",
-                 "X_fuel.___lb", "total.___lb", "fuel1.tankC", "p-alt.ftMSL"]
+                 "X_fuel.___lb", "total.___lb", "fuel1.tankC", "p-alt.ftMSL",
+                "_zulu,_time",
+                "Gload,norml",
+                "Gload,axial",
+                "Gload,_side",
+                "_roll,__deg",
+                "_trim,_elev",
+                "_trim,ailrn",
+                "_flap,postn"]
 
 # remove X and replace . with ,
 column_names_select = [str.replace(x,"X","") for x in column_name_select]
@@ -394,6 +449,8 @@ dfs['type'] = dfs.apply(lambda x: flight_condition(x['p-alt,ftMSL'],x['Vtrue,_kt
 
 line_graph(dfs['__lon,__deg'], dfs['__lat,__deg'],"Longitude", "Latitude", "Graph of lat by lon", f"{folder}/lat_lon.png")
 
+scatter_graph(dfs['__lon,__deg'], dfs['__lat,__deg'],dfs["p-alt,ftMSL"],"Longitude", "Latitude", "Graph of lat by lon", f"{folder}/lat_lon_sct.png")
+
 line_graph(dfs['_totl,_time'], dfs['p-alt,ftMSL'],"Time", "Altitude", "Graph of altitude by time", f"{folder}/alt_time.png")
 
 hist_graph(dfs,'_Vind,_kias',None,"xyz")
@@ -418,3 +475,145 @@ base_map_plot(sdata=1,lat=dfs['__lat,__deg'],lon=dfs['__lon,__deg'],area=dfs['p-
               title="Title",name="map")
 
 ###############################################################################
+
+def fdr_graph(x,xlabel,y1,y1label,y2,y2label,y3,y3label,y3i,y3ilabel,y4,y4label,y4i,y4ilabel,y5,y5label,y6,y6label,y7,y7label,y8,y8label,y8i,y8ilabel,title,text_size,ratio):
+    # multiple plots sharing same x-axis
+    #fig, ax = plt.subplots(8, sharex=True)
+    fig = plt.figure()
+    gs = fig.add_gridspec(8, hspace=0)
+    ax = gs.subplots(sharex=True)
+    
+    # altitude graph
+    ax[0].plot(x, y1,color="#3250a8")
+    #ax[0].set_yticks(np.arange(min(0,min(dfs['p-alt,ftMSL'])), max(dfs['p-alt,ftMSL']), ratio*max(dfs['p-alt,ftMSL'])))
+    ax[0].set_ylabel(y1label,size=text_size,color="#3250a8")
+    ax[0].tick_params(axis='y', colors='#3250a8')
+    ax[0].set_yticklabels(ax[0].get_yticks().astype(np.int64),rotation='horizontal',size=text_size)
+    
+    # get the current labels 
+    #labels = [item.get_text() for item in ax[0].get_xticklabels()]
+    # Beat them into submission and set them back again
+    #ax[0].set_xticklabels([str(round(float(label), 2)) for label in labels])
+    
+    # airspeed graph
+    ax[1].plot(x, y2,color="#a83232")
+    #ax[1].set_yticks(np.arange(min(0,min(dfs['_Vind,_kias'])), max(dfs['_Vind,_kias']), ratio*max(dfs['_Vind,_kias'])))
+    ax[1].yaxis.tick_right()
+    ax[1].yaxis.set_label_position("right")
+    ax[1].set_ylabel(y2label,size=text_size,color="#a83232")
+    ax[1].tick_params(axis='y', colors='#a83232')
+    ax[1].set_yticklabels(ax[1].get_yticks().astype(np.int64),rotation='horizontal',size=text_size)
+    
+    # pitch and roll degrees graph
+    ax[2].plot(x, y3, color="#3250a8")
+    #ax[2].set_yticks(np.arange(min(0,min(dfs['pitch,__deg'])), max(dfs['pitch,__deg']), ratio*max(dfs['pitch,__deg'])))
+    ax[2].set_ylabel(y3label,size=text_size,color="#3250a8")
+    ax[2].tick_params(axis='y', colors='#3250a8')
+    ax[2].set_yticklabels(ax[2].get_yticks().astype(np.int64),rotation='horizontal',size=text_size)
+    #ax[2].plot(x,y,'b-')
+    ax1 = ax[2].twinx()
+    ax1.plot(x, y3i,color="#a83232")
+    #ax1.set_yticks(np.arange(min(0,min(dfs['_roll,__deg'])), max(dfs['_roll,__deg']), ratio*max(dfs['_roll,__deg'])))
+    ax1.yaxis.tick_right()
+    ax1.yaxis.set_label_position("right")
+    ax1.set_ylabel(y3ilabel,size=text_size,color="#a83232")
+    ax1.tick_params(axis='y', colors='#a83232')
+    ax1.set_yticklabels(ax1.get_yticks().astype(np.int64),rotation='horizontal',size=text_size)
+    
+    #ax[2].spines['left'].set_color('#3250a8')
+    #ax[2].spines['right'].set_color('#a83232')
+
+    
+    # gload accel and lat
+    ax[3].plot(x, y4,color="#3250a8")
+    #ax[3].set_yticks(np.arange(min(0,min(dfs['Gload,axial'])), max(dfs['Gload,axial']), ratio*max(dfs['Gload,axial'])))
+    ax[3].set_ylabel(y4label,size=text_size,color="#3250a8")
+    ax[3].tick_params(axis='y', colors='#3250a8')
+    ax[3].set_yticklabels(ax[3].get_yticks().astype(np.int64),rotation='horizontal',size=text_size)
+    #ax[2].plot(x,y,'b-')
+    ax2 = ax[3].twinx()
+    ax2.plot(x, y4i,color="#a83232")
+    #ax2.set_yticks(np.arange(min(0,min(dfs['Gload,axial'])), max(dfs['Gload,axial']), ratio*max(dfs['Gload,axial'])))
+    ax2.yaxis.tick_right()
+    ax2.yaxis.set_label_position("right")
+    ax2.set_ylabel(y4ilabel,size=text_size,color="#a83232")
+    ax2.tick_params(axis='y', colors='#a83232')
+    ax2.set_yticklabels(ax2.get_yticks().astype(np.int64),rotation='horizontal',size=text_size)
+    
+    # gload long
+    ax[4].plot(x, y5,color="#a832a0")
+    #ax[4].set_yticks(np.arange(min(0,min(dfs['Gload,axial'])), max(dfs['Gload,axial']), ratio*max(dfs['Gload,axial'])))
+    ax[4].set_ylabel(y5label,size=text_size,color="#a832a0")
+    ax[4].tick_params(axis='y', colors='#a832a0')
+    ax[4].set_yticklabels(ax[4].get_yticks().astype(np.int64),rotation='horizontal',size=text_size)
+    
+    # heading
+    ax[5].plot(x, y6,color="#a83232")
+    #ax[5].set_yticks(np.arange(min(0,min(dfs['hding,__mag'])), max(dfs['hding,__mag']), ratio*max(dfs['hding,__mag'])))
+    ax[5].yaxis.tick_right()
+    ax[5].yaxis.set_label_position("right")
+    ax[5].set_ylabel(y6label,size=text_size,color="#a83232")
+    ax[5].tick_params(axis='y', colors='#a83232')
+    ax[5].set_yticklabels(ax[5].get_yticks().astype(np.int64),rotation='horizontal',size=text_size)
+    
+    # flap
+    ax[6].plot(x, y7,color="#a832a0")
+    #ax[6].set_yticks(np.arange(min(0,min(dfs['_flap,postn'])), max(dfs['_flap,postn']), ratio*max(dfs['_flap,postn'])))
+    ax[6].set_ylabel(y7label,size=text_size,color="#a832a0")
+    ax[6].tick_params(axis='y', colors='#a832a0')
+    ax[6].set_yticklabels(ax[6].get_yticks().astype(np.int64),rotation='horizontal',size=text_size)
+    
+    # trim elev and trim alrn
+    ax[7].plot(x, y8,color="#3250a8")
+    #ax[7].set_yticks(np.arange(min(0,min(dfs['_trim,ailrn'])), max(dfs['_trim,ailrn']), 0.25*max(dfs['_trim,ailrn'])))
+    ax[7].set_ylabel(y8label,size=text_size,color="#3250a8")
+    ax[7].tick_params(axis='y', colors='#3250a8')
+    ax[7].set_yticklabels(ax[7].get_yticks().astype(np.int64),rotation='horizontal',size=text_size)
+    #ax[2].plot(x,y,'b-')
+    ax3 = ax[7].twinx()
+    ax3.plot(x, y8i,color="#a83232")
+    #ax3.set_yticks(np.arange(min(0,min(dfs['_trim,_elev'])), max(dfs['_trim,_elev']), 0.25*max(dfs['_trim,_elev'])))
+    ax3.yaxis.tick_right()
+    ax3.yaxis.set_label_position("right")
+    ax3.set_ylabel(y8ilabel,size=text_size,color="#a83232")
+    ax3.tick_params(axis='y', colors='#a83232')
+    ax3.set_yticklabels(ax3.get_yticks().astype(np.int64),rotation='horizontal',size=text_size)
+    
+    ax[0].set_title(title, size=text_size)
+    ax[7].set_xlabel(xlabel, size=text_size)
+    ax[7].set_xticklabels(ax[7].get_xticks().astype(np.int64),rotation='horizontal',size=text_size)
+    
+    #for i in range(0,7,1):
+    #    #labels = []
+    #    # get the current labels 
+    #    labels = [item.get_text() for item in ax[i].get_yticklabels()]
+    #    # Beat them into submission and set them back again
+    #    ax[i].set_yticklabels([str(round(float(label), 2)) for label in labels])
+    
+    #ax[0].set_axisbelow(True) # to put gridlines at back
+    #ax[0].grid(linestyle='--',color='#CECECE')
+    
+    #for i in range(0,8,1):
+    #    ax[i].spines[['top', 'bottom']].set_visible(False)
+    
+    #set size of graph
+    cmsize=1/2.54
+    fig.set_size_inches(30*cmsize, 15*cmsize)
+    
+    # save
+    plt.savefig(f'{folder}/'+'_fdr.png', dpi=400, bbox_inches='tight')
+    plt.close()
+    
+fdr_graph(x=dfs['_totl,_time'], xlabel="Time",
+          y1=dfs['p-alt,ftMSL'], y1label="Altitude",
+          y2=dfs['_Vind,_kias'], y2label="Speed",
+          y3=dfs['pitch,__deg'], y3label="Pitch",
+          y3i=dfs['_roll,__deg'], y3ilabel="Roll",
+          y4=dfs['Gload,norml'], y4label="Gload_n",
+          y4i=dfs['Gload,_side'], y4ilabel="Gload_s",
+          y5=dfs['Gload,axial'], y5label="Gload_a",
+          y6=dfs['hding,__mag'], y6label="Heading",
+          y7=dfs['_flap,postn'], y7label="Flap",
+          y8=dfs['_trim,ailrn'],y8label="Trim_a",
+          y8i=dfs['_trim,_elev'],y8ilabel="Trim_e",
+          title="Title",text_size=6,ratio=0.3)
