@@ -16,6 +16,18 @@ import glob
 #import time
 from mpl_toolkits.basemap import Basemap
 
+import warnings
+warnings.filterwarnings('ignore')
+plt.rcParams["font.family"] = "Cambria" # this sets the font type to use for any matplotlib graphs
+
+###############################################################################
+dep = "EIDW"
+dep_name = "Dublin"
+arr = "EGCC"
+arr_name = "Manchester"
+
+print(f"The route for today is from {dep} to {arr}. This is a flight from {dep_name} to {arr_name}.")
+
 # file folder location 
 folder = r"C:\\Folder"
 
@@ -28,10 +40,8 @@ folder = r"C:\\Folder"
 # check output folder exists and if not create it
 if not os.path.exists(folder):
     os.makedirs(folder, exist_ok=True)
-    
-
-    
-    
+       
+  ###############################################################################  
 def number_format(num):
     
     if num > 0:
@@ -51,7 +61,7 @@ def number_format(num):
 #tst2 = number_format(54323456)
 #tst3 = number_format(45.23456)
 
-def line_graph(x,y,xx,yy,title,file_loc):
+def line_graph(x,y,xx,yy,title,file_loc,annotate):
     fig, ax = plt.subplots()
     
     # Plot each bar plot. Note: manually calculating the 'dodges' of the bars
@@ -69,6 +79,25 @@ def line_graph(x,y,xx,yy,title,file_loc):
             except:
                    pass
     
+    if annotate==True:
+        # for this graph only want to annotate the first and last lat and lon points - combine with details about dep and arr.
+        lons = [x[0],x[len(x)-1]]
+        lats = [y[0],y[len(y)-1]]
+        labels1 = [dep,arr]
+        
+        for x,y,z,a in zip(lons, lats, labels1,np.arange(0,len(lons))):
+    
+            labels = labels1[int(a)]#"{}".format(label)
+        
+            plt.annotate(labels, # this is the text
+                         (x,y),
+                         #(x,y), # these are the coordinates to position the label
+                         xycoords='data',
+                         textcoords="offset points", # how to position the text
+                         xytext=(0,10), # distance from text to points (x,y)
+                         ha='center',
+                         rotation='horizontal', fontsize=8) # horizontal alignment can be left, right or center
+        
     # Customise some display properties for line graph
     ax.set_ylabel(yy,size=8)
     #ax.set_ylim(0,200) #(0,max(df.Sales)+10)
@@ -101,7 +130,7 @@ def line_graph(x,y,xx,yy,title,file_loc):
     #plt.show()
     plt.close()
     
-def scatter_graph(x,y,cc,xx,yy,title,file_loc):
+def scatter_graph(x,y,cc,xx,yy,title,file_loc,annotate):
     fig, ax = plt.subplots()
     
     # Plot each bar plot. Note: manually calculating the 'dodges' of the bars
@@ -114,6 +143,25 @@ def scatter_graph(x,y,cc,xx,yy,title,file_loc):
     #ax.plot(x,y)
 
     sc = ax.scatter(x, y, c=cc, cmap="jet")
+    
+    if annotate==True:
+        # for this graph only want to annotate the first and last lat and lon points - combine with details about dep and arr.
+        lons = [x[0],x[len(x)-1]]
+        lats = [y[0],y[len(y)-1]]
+        labels1 = [dep,arr]
+        
+        for x,y,z,a in zip(lons, lats, labels1,np.arange(0,len(lons))):
+    
+            labels = labels1[int(a)]#"{}".format(label)
+        
+            plt.annotate(labels, # this is the text
+                         (x,y),
+                         #(x,y), # these are the coordinates to position the label
+                         xycoords='data',
+                         textcoords="offset points", # how to position the text
+                         xytext=(0,10), # distance from text to points (x,y)
+                         ha='center',
+                         rotation='horizontal', fontsize=8) # horizontal alignment can be left, right or center
 
     
     # Customise some display properties for line graph
@@ -225,9 +273,14 @@ def base_map_plot(sdata,lat,lon,area,label,bar,ldg_name,title,name):
               c=area, s=sdata,
               cmap="jet", zorder=2)#, alpha=0.5)
     
-    for x,y,z,a in zip(lon, lat, label,np.arange(0,len(lon))):
+    # for this graph only want to annotate the first and last lat and lon points - combine with details about dep and arr.
+    lons = [lon[0],lon[len(lon)-1]]
+    lats = [lat[0],lat[len(lat)-1]]
+    labels1 = [dep,arr]
+    
+    for x,y,z,a in zip(lons, lats, labels1,np.arange(0,len(lons))):
 
-        labels = label[int(a)]#"{}".format(label)
+        labels = labels1[int(a)]#"{}".format(label)
     
         plt.annotate(labels, # this is the text
                      m(x,y),
@@ -296,7 +349,7 @@ def hist_graph(df,xx,bins,savename):
     plt.savefig(f'{folder}/{str(savename)}'+'_hist.png', dpi=400, bbox_inches='tight')
     plt.close()
 
-
+###############################################################################
 # df = pd.DataFrame({"val":[1,2,3], "val_str":["1","2","3"]})
 
 #df = pd.DataFrame({"val":[random.randint(0,1000) for p in range(0,900,1)], "val_str":np.repeat(["1","2","3"],300)})
@@ -411,31 +464,25 @@ def flight_condition(altitude,speed,altitude_chg, speed_cat, x):
     #val <- "on ground"
     val = "on_ground"
 
-  
   # if altitude_chg (nxt) > altitude + x - climbing
   elif altitude_chg > x:
     #val <- "climbing"
     val = "climbing"
-  
   
   # if altitude_chg (nxt) >= altitude - x or altitude_chg <= altitude + x - level
   elif(((altitude_chg >= 0-x) and (altitude_chg <= x))):
     #val <- "level"
     val = "level"
   
-  
-  
   # if altitude_chg (nxt) < altitude - x - descending
   elif(altitude_chg < 0-x):
     #val <- "descending"
     val = "descending"
   
-  
   # if altitude within 50 of ending altitude and speed < speed_car - arrival
   elif(altitude <= (altitude[len(altitude)]+50) and speed <= speed_cat):
     #val <- "on ground"
-    val = "on_ground"
-  
+    val = "on_ground" 
   
   else:
     #val <- "unknown"
@@ -447,11 +494,11 @@ dfs['type'] = dfs.apply(lambda x: flight_condition(x['p-alt,ftMSL'],x['Vtrue,_kt
 
 # graph the route, stages of flight / altitude, speed etc.
 
-line_graph(dfs['__lon,__deg'], dfs['__lat,__deg'],"Longitude", "Latitude", "Graph of lat by lon", f"{folder}/lat_lon.png")
+line_graph(dfs['__lon,__deg'], dfs['__lat,__deg'],"Longitude", "Latitude", "Graph of lat by lon", f"{folder}/lat_lon.png", annotate=True)
 
-scatter_graph(dfs['__lon,__deg'], dfs['__lat,__deg'],dfs["p-alt,ftMSL"],"Longitude", "Latitude", "Graph of lat by lon", f"{folder}/lat_lon_sct.png")
+scatter_graph(dfs['__lon,__deg'], dfs['__lat,__deg'],dfs["p-alt,ftMSL"],"Longitude", "Latitude", "Graph of lat by lon", f"{folder}/lat_lon_sct.png", annotate=True)
 
-line_graph(dfs['_totl,_time'], dfs['p-alt,ftMSL'],"Time", "Altitude", "Graph of altitude by time", f"{folder}/alt_time.png")
+line_graph(dfs['_totl,_time'], dfs['p-alt,ftMSL'],"Time", "Altitude", "Graph of altitude by time", f"{folder}/alt_time.png", annotate=False)
 
 hist_graph(dfs,'_Vind,_kias',None,"xyz")
 
@@ -469,10 +516,9 @@ dual_line_graph(dfs['_totl,_time'], dfs['p-alt,ftMSL'], "Time", "Altitude", dfs[
 # dual line graph of fuel and speed
 dual_line_graph(dfs['_totl,_time'], dfs['_Vind,_kias'], "Time", "Speed", dfs['_fuel,___lb'], "Fuel", "Fuel and Speed", f"{folder}/dual_line3.png")
 
-
 # plot on basemap
 base_map_plot(sdata=1,lat=dfs['__lat,__deg'],lon=dfs['__lon,__deg'],area=dfs['p-alt,ftMSL'],label="",ldg_name="Altitude",bar=True,
-              title="Title",name="map")
+              title=f"Title for route from {dep} to {arr}",name="map")
 
 ###############################################################################
 
@@ -616,4 +662,4 @@ fdr_graph(x=dfs['_totl,_time'], xlabel="Time",
           y7=dfs['_flap,postn'], y7label="Flap",
           y8=dfs['_trim,ailrn'],y8label="Trim_a",
           y8i=dfs['_trim,_elev'],y8ilabel="Trim_e",
-          title="Title",text_size=6,ratio=0.3)
+          title=f"FDR view for flight from {dep} to {arr}",text_size=6,ratio=0.3)
