@@ -48,6 +48,40 @@ def number_format(num):
         return 0
     else:
         return round(num,2)
+    
+    # r runif like np.random.uniform(low=,high=,size=)
+    
+def jitter_kcj1(x):
+    x11 = []
+    
+    if len(x) <= 1 or max(x) == min(x):
+        return x
+
+    # get range of values of x
+    z = max(x) - min(x)
+    
+    #print(x)
+    for xx in x:
+        #print(xx)
+        # if length is 0 return 0
+        if math.isnan(xx):
+            x11.append(xx)
+            continue
+            #return xx
+        # check if is numeric
+        #if type(xx) not in (int, float, complex):
+        #    raise ValueError("'x' must be a number")
+        
+        # get range of values to highest power of 10
+        d = (round(xx,3-math.trunc(math.log10(z))))/10
+        
+        amount = 1/5*abs(d)+0.01
+        
+        #x1 = abs(xx + np.random.uniform(low=-amount,high=amount,size=len(x)))
+        x1 = (xx + np.random.uniform(low=-amount,high=amount,size=len(x)))
+        x11.append(x1)
+    return x11
+  
    
 # qq plot from https://stackoverflow.com/questions/13865596/quantile-quantile-plot-using-scipy
 def QQ_plot(data, save_loc):
@@ -305,6 +339,72 @@ if graph_by_column_name == True:
         # save
         plt.savefig(f'{folder}/{str(i)}/{str(i)}'+'_boxplot.png', dpi=400, bbox_inches='tight')
         
+        #### dotplot
+        fig, ax = plt.subplots()
+        
+        tst1 = df_num[i].values
+        tst1[np.isnan(tst1)] = 0
+        
+        #tst1i = np.array(jitter_kcj(tst1))[:,1]
+        
+        #tst = jitter_kcj(df_num[i])
+        
+        #tst2 = np.arange(0,len(tst1))
+        
+        #len1 = len(tst1)
+        #len2 = len(jitter_kcj(tst1))
+        #len3 = len(np.arange(0,len(tst1)))
+        
+        #ax.boxplot(x=df_num[i], labels=labels, showmeans = False)
+        ax.scatter(x=np.arange(0,len(tst1)),y=np.array(jitter_kcj1(tst1))[:,-1], alpha=0.5)#df_num[[i]].boxplot(ax=ax)
+        plt.axhline(mean,linestyle="solid",c="red")
+        plt.axhline(mean+(2*std),linestyle="dashed",c="red")
+        plt.axhline(mean-(2*std),linestyle="dashed",c="red")
+        ax.grid(linestyle='',color='#CECECE')
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.set_xlabel(str(i),size=10)
+        ax.set_ylabel("Number", size=10)
+        ax.set_title(graph_title,size=12)
+        #ax.set_ylim(0,int(mean+(2*std)))
+        plt.ylim(bottom=0)
+        
+        # annotate graph
+        #for x in zip()
+        
+        #set size of graph
+        cmsize=1/2.54
+        fig.set_size_inches(30*cmsize, 15*cmsize)
+        
+        # save
+        plt.savefig(f'{folder}/{str(i)}/{str(i)}'+'_dotplot.png', dpi=400, bbox_inches='tight')
+        
+        #### dotplot1
+        fig, ax = plt.subplots()
+        
+        ax.scatter(y=np.arange(0,len(tst1)),x=np.array(jitter_kcj1(tst1))[:,-1], alpha=0.5)#df_num[[i]].boxplot(ax=ax)
+        plt.axvline(mean,linestyle="solid",c="red")
+        plt.axvline(mean+(2*std),linestyle="dashed",c="red")
+        plt.axvline(mean-(2*std),linestyle="dashed",c="red")
+        ax.grid(linestyle='',color='#CECECE')
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.set_xlabel(str(i),size=10)
+        ax.set_ylabel("Number", size=10)
+        ax.set_title(graph_title,size=12)
+        #ax.set_xlim(0,int(mean+(2*std)))
+        plt.xlim(left=0)
+        
+        # annotate graph
+        #for x in zip()
+        
+        #set size of graph
+        cmsize=1/2.54
+        fig.set_size_inches(30*cmsize, 15*cmsize)
+        
+        # save
+        plt.savefig(f'{folder}/{str(i)}/{str(i)}'+'_dotplot1.png', dpi=400, bbox_inches='tight')
+        
         # qq plot
         QQ_plot(df_num[i],f'{folder}/{str(i)}/{str(i)}'+'_qqplot.png')
         
@@ -513,6 +613,72 @@ if graph_by_column_number == True:
         
         # save
         plt.savefig(f'{folder}/{str(df_num.columns[i])}/{str(df_num.columns[i])}'+'_boxplot.png', dpi=400, bbox_inches='tight')# plot histogram and boxplot of this data
+
+        #### dotplot
+        fig, ax = plt.subplots()
+        
+        tst1 = df_num[df_num.columns[i]].values
+        tst1[np.isnan(tst1)] = 0
+        
+        #tst1i = np.array(jitter_kcj(tst1))[:,1]
+        
+        #tst = jitter_kcj(df_num[i])
+        
+        #tst2 = np.arange(0,len(tst1))
+        
+        #len1 = len(tst1)
+        #len2 = len(jitter_kcj(tst1))
+        #len3 = len(np.arange(0,len(tst1)))
+        
+        #ax.boxplot(x=df_num[i], labels=labels, showmeans = False)
+        ax.scatter(x=np.arange(0,len(tst1)),y=np.array(jitter_kcj1(tst1))[:,-1], alpha=0.5)#df_num[[i]].boxplot(ax=ax)
+        plt.axhline(mean,linestyle="solid",c="red")
+        plt.axhline(mean+(2*std),linestyle="dashed",c="red")
+        plt.axhline(mean-(2*std),linestyle="dashed",c="red")
+        ax.grid(linestyle='',color='#CECECE')
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.set_xlabel(str(i),size=10)
+        ax.set_ylabel("Number", size=10)
+        ax.set_title(graph_title,size=12)
+        #ax.set_ylim(0,int(mean+(2*std)))
+        plt.ylim(bottom=0)
+        
+        # annotate graph
+        #for x in zip()
+        
+        #set size of graph
+        cmsize=1/2.54
+        fig.set_size_inches(30*cmsize, 15*cmsize)
+        
+        # save
+        plt.savefig(f'{folder}/{str(df_num.columns[i])}/{str(df_num.columns[i])}'+'_dotplot.png', dpi=400, bbox_inches='tight')
+        
+        #### dotplot1
+        fig, ax = plt.subplots()
+        
+        ax.scatter(y=np.arange(0,len(tst1)),x=np.array(jitter_kcj1(tst1))[:,-1], alpha=0.5)#df_num[[i]].boxplot(ax=ax)
+        plt.axvline(mean,linestyle="solid",c="red")
+        plt.axvline(mean+(2*std),linestyle="dashed",c="red")
+        plt.axvline(mean-(2*std),linestyle="dashed",c="red")
+        ax.grid(linestyle='',color='#CECECE')
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.set_xlabel(str(i),size=10)
+        ax.set_ylabel("Number", size=10)
+        ax.set_title(graph_title,size=12)
+        #ax.set_xlim(0,int(mean+(2*std)))
+        plt.xlim(left=0)
+        
+        # annotate graph
+        #for x in zip()
+        
+        #set size of graph
+        cmsize=1/2.54
+        fig.set_size_inches(30*cmsize, 15*cmsize)
+        
+        # save
+        plt.savefig(f'{folder}/{str(df_num.columns[i])}/{str(df_num.columns[i])}'+'_dotplot1.png', dpi=400, bbox_inches='tight')
 
         # qq plot
         QQ_plot(df_num[df_num.columns[i]],f'{folder}/{str(df_num.columns[i])}/{str(df_num.columns[i])}'+'_qqplot.png')
