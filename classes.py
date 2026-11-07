@@ -8,6 +8,16 @@ folder = r"C:\Users\kelvi\Desktop"
 db_name = "test_db.db"
 db = rf"{folder}\{db_name}"
 
+# function to run a query and commit as must commit to save the data otherwise just temporary
+def run_sql(conn,query,many=False):
+    
+    if many==True:
+        conn.executemany(query)
+        conn.commit()
+    else:
+        conn.execute(query)
+        conn.commit()
+
 conn = sqlite3.connect(db) # if does not exist will be created
 #cursor = conn.cursor()
 
@@ -28,6 +38,15 @@ try:
                  
     # commit the data
     conn.commit()
+    
+    # or function
+    run_sql(conn,query="""
+                 create table if not exists xyz (
+                     id INTEGER PRIMARY KEY,
+                     product TEXT,
+                     item TEXT
+                     )
+                 """)
     
     # write some data
     conn.executemany(

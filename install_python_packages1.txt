@@ -1,0 +1,27 @@
+# install non core/base packages
+
+pip install basemap datetime docx geopandas glob2 keras logging matplotlib numpy pandas pylatex pypdf pytest scipy selenium shapely scikit-learn statsmodels streamlit tensorflow --ignore-requires-python
+
+# or pip install -r requirements.txt
+# place the packages in requirements file
+
+basemap
+datetime
+docx
+geopandas
+glob2
+keras
+logging
+matplotlib
+numpy
+pandas
+pylatex
+pypdf
+pytest
+scipy
+selenium
+shapely
+scikit-learn
+statsmodels
+streamlit
+tensorflow
