@@ -1,6 +1,17 @@
 # install non core/base packages
 
-pip install basemap datetime docx geopandas glob2 keras logging matplotlib numpy pandas pylatex pypdf pytest scipy selenium shapely scikit-learn statsmodels streamlit tensorflow --ignore-requires-python
+# on linux create venv first
+sudo python3 -m pip install
+sudo apt install python3-venv
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install -r requirements.txt (or copy and paste list to install)
+
+# deactivate .venv and remove it (if needed)
+deactivate
+rm -rf .venv (or e.g. $HOME/Desktop/.venv)
+
+pip install datetime docx geopandas glob2 keras logging matplotlib numpy pandas pylatex pypdf pytest scipy selenium shapely scikit-learn statsmodels streamlit tensorflow --ignore-requires-python
 
 # or pip install -r requirements.txt
 # place the packages in requirements file
